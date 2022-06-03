@@ -1,0 +1,106 @@
+@GuideBook(title: "Date Planner", icon: title.png, background: titleBackground.png, firstFile: DatePlannerApp.swift) {
+    @WelcomeMessage(title: "Date Planner") {
+        Use this app to organize and plan a series of events by date.
+    }
+    @Guide {
+        @Step(title: "Date Planner") {
+            @ContentAndMedia {
+                ![](intro.png)  
+
+                 Welcome to the Date Planner app. Use this app to organize and plan a series of events, organized by date. 
+            
+                 This walkthrough teaches you how to use lists and an [observable](glossary://observable%20object) data model to create dynamic lists of events and tasks. Time to jump in.
+
+                @GuideButton(type: walkthrough, title: "Start Walkthrough", description: "AX description for button")
+            }
+            @Task(type: walkthrough, title: "App Configuration", id: "eventPlannerApp", file: DatePlannerApp.swift) {
+                Learn how the app shares data with its views by creating a single data object and making it available to the entire [view hierachy](glossary://view%20hierarchy).
+            
+                @Page(id: "1.navigationView", title: "App Configuration") {
+                    To navigate between different views in your app, create a [NavigationView](doc://com.apple.documentation/documentation/swiftui/navigationview) as the [top-level view](glossary://top-level%20view) in your [view hierarchy](glossary://view%20hierarchy), inserting the app’s home view. For this app, `EventList` is that home view and the first view the app displays when it launches.
+                }
+                @Page(id: "1.textPlaceholder", title: "App Configuration") {
+                    In wider app configurations, such full-screen landscape on an iPad, SwiftUI displays the `NavigationView` content as multiple adjacent columns, rather than a single stack. In this layout, your `EventList` displays in a sidebar column, and its destination content appears in the primary pane. 
+                    
+                    Adding a `Text` view is a useful way to give the second column a placeholder view until a person selects an event in the list. When a person selects an event, the app replaces the placeholder view with an `EventDetail` view.
+                }
+                @Page(id: "1.stateObject", title: "App Configuration") {
+                    The app stores its data using the variable `eventData`. It’s defined with the `@StateObject` [property wrapper](glossary://property%20wrapper) to create an instance of an [observable object](glossary://observable%20object), `EventData`. Because this object is observable, SwiftUI watches it to keep track of any changes to its values. Whenever the data changes, SwiftUI automatically updates all of the views that use (or [observe](glossary://observer)) it.
+                }
+                @Page(id: "1.environmentObject", title: "App Configuration") {
+                    To make `eventData` available to your entire [view hierarchy](glossary://view%20hierarchy), use the `.environmentObject` [modifier](glossary://modifier) and pass in the `eventData` instance. Now you can use this data across all of your navigation view’s [child views](glossary://child%20view) (and their child views as well). 
+                }
+            }
+            @Task(type: walkthrough, title: "Event Model", id: "event", file: Event.swift) {
+                Your event model holds all of the data needed to visualize and organize events in your list. Here you’ll explore how to structure an `Event`.
+
+                @Page(id: "2.eventType", title: "Event Model") {
+                    To organize its data, Event planner uses a collection of `Event` objects, each of which represent a specific event, such as a camping trip or birthday party. By conforming to the `Identifiable` [protocol](glossary://protocol), you ensure that when you create a list of events, SwiftUI can identify and update each row. 
+                }
+                @Page(id: "2.eventProperties", title: "Event Model") {
+                    The `Event` type contains all of the information you need to populate an event, including a symbol, color, title, date, and collection of tasks. Each task is a specific to-do item for the event, such as “Get a camping lantern“.
+                }
+                @Page(id: "2.computedProperties", title: "Event Model") {
+                    You’ll also notice a list of [computed properties](glossary://computed%20property) for `Event`. These help people organize the sections of their lists based on the date and the number of tasks to complete.
+                }
+                @Page(id: "2.isPast", title: "Event Model") {
+                    For instance, the `isPast` property checks to see if the `date` property is less than `Date.now`, which is the current date and time. The property returns `true` when the event date is in the past, which allows people to sort any past events into their own category.
+                }
+                @Page(id: "2.otherProperties", title: "Event Model") {
+                    Take a moment to examine some of the other properties defined here. Can you figure out how they might help organize the list of events?
+                }
+            }
+            @Task(type: walkthrough, title: "Event Task", id: "eventTask", file: EventTask.swift) {
+                An event task represents a to-do item for an event. Here, you’ll learn how to model the tasks.
+
+                @Page(id: "3.eventTask", title: "Event Task") {
+                    An `EventTask` represents one of a collection of to-do items for an event. Like `Event`, an `EventTask` is also `Identifiable`, which lets SwiftUI manage and update its appearance in a list.
+                }
+                @Page(id: "3.properties", title: "Event Task") {
+                    `EventTask` contains properties for text, completion state, and an `isNew` property. When a person marks a task as completed, you set `isCompleted` to `true`, which allows your app to track the remaining tasks for each event.
+                }
+            }
+            @Task(type: walkthrough, title: "Event Data", id: "eventData", file: EventData.swift) {
+                You use the `EventData` [observable object](glossary://observable%20object) to populate the data in your event list. Here you’ll learn how to structure and update the data. 
+
+                @Page(id: "4.eventData", title: "Event Data") {
+                    This is the `EventData` type, which stores and modifies all of the events that your app displays in its UI. `EventData` conforms to the `ObservableObject` [protocol](glossary://protocol), which means that if any of its [published values](glossary://published%20value) change, SwiftUI notifies all [observers](glossary://observer) (views using those values) and updates those views automatically.
+                }
+                @Page(id: "4.events", title: "Event Data") {
+                    `EventData` contains a property called `events` that stores a prepopulated array of `Event` values, such as game night or a doctor’s appointment. By using the `@Published` [property wrapper](glossary://property%20wrapper) when defining this property, you instruct SwiftUI to notify all [observers](glossary://observer) and update their views whenever the `events` array changes. This allows you to add and delete events from the array and see the change instantly in your UI.
+                }
+                @Page(id: "4.methods", title: "Event Data") {
+                    `EventData` provides methods for adding and deleting events. In addition, `sortedEvents(period:)`  returns an array of sorted events based on the requested time period. Use this method in `EventList` to create sections based upon the event’s date, such as Next 7 Days.
+                }
+                @Page(id: "4.periodEnum", title: "Event Data") {
+                    The `Period` enumeration provides each of the time categories that you’ll use to sort the list. The categories are `nextSevenDays`, `nextThirtyDays`, `future`, and `past`.
+                }
+            }
+            @Task(type: walkthrough, title: "Event List", id: "eventList", file: EventList.swift) {
+                Learn how to construct the primary UI for the app — the event list — using a [List](doc://com.apple.documentation/documentation/swiftui/list) view.
+
+                @Page(id: "5.eventList", title: "Event List") {
+                    The `EventList` view creates a grouped listing of events using a `List` view.
+                }
+                @Page(id: "5.eventData", title: "Event List") {
+                    In `DatePlannerApp`, the [top-level navigation view](glossary://top-level%20view) uses the `.environmentObject` modifier to pass in an instance of `EventData`, making it accessible to all of its [child views](glossary://child%20view). You can now access that data in this child view by declaring a variable with the `@EnvironmentObject` [property wrapper](glossary://property%20wrapper) and giving it the `EventData` type. You now have access to all of the prepopulated event data to create your list.
+                }
+                @Page(id: "5.listForEach", title: "Event List") {
+                    To make your list, create a `List` view and use a `ForEach` loop to iterate over all of the time periods (`nextSevenDays`, `nextThirtyDays`, `future`, and `past`).
+                }
+                @Page(id: "5.checkForEvents", title: "Event List") {
+                    Next, check that the current time period contains at least one event, otherwise, don’t show any data for it.
+                }
+                @Page(id: "5.listSection", title: "Event List") {
+                    When you know there are events in a section, create a `Section` view and use `ForEach` to iterate over all events in that time period. Use the method `sortedEvents(period:)` from `EventData` to return the events specific to the section’s time range.
+                }
+                @Page(id: "5.eventView", title: "Event List") {
+                    Inside the `ForEach`, create the `EventRow` views for each event in the time period. To do this, use a [NavigationLink](doc://com.apple.documentation/documentation/swiftui/navigationlink), then add an `EventRow` as the label (the part that you see), and an `EventEditor` as the destination (the part you navigate to when tapped). The event editor is where you’ll see all the tasks for each event and edit the event details.
+                }
+                @Page(id: "5.deleteEvents", title: "Event List") {
+                    To delete events, add the modifier `.swipeActions` on the event row and define a button that calls the `delete` method from `EventData`. You can now swipe on an event and tap the delete button to remove the current event.
+                }
+            }
+        }
+    }
+}
